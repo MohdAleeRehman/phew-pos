@@ -35,7 +35,7 @@
           <div
             v-for="item in filteredMenuItems"
             :key="item._id"
-            class="bg-white rounded-xl p-4 md:p-6 cursor-pointer transition-all shadow-md hover:-translate-y-0.5 hover:shadow-lg hover:border-2 hover:border-[#2d7a7a] h-[140px] md:h-[160px] flex flex-col justify-between"
+            class="bg-white rounded-xl p-4 md:p-6 cursor-pointer transition-all shadow-md hover:-translate-y-0.5 hover:shadow-lg hover:border-2 hover:border-[#2d7a7a] h-35 md:h-40 flex flex-col justify-between"
             @click="addToCart(item)"
           >
             <div>
@@ -46,7 +46,7 @@
         </div>
       </div>
 
-      <div class="w-full lg:w-[420px] xl:w-[480px] bg-white rounded-xl p-4 md:p-6 flex flex-col shadow-md">
+      <div class="w-full lg:w-105 xl:w-120 bg-white rounded-xl p-4 md:p-6 flex flex-col shadow-md">
         <div class="flex justify-between items-center mb-4 pb-4 border-b-2 border-[#e0e0e0]">
           <h2 class="text-xl md:text-2xl font-bold text-[#2c3e50]">Cart</h2>
           <button 
@@ -72,14 +72,14 @@
               <p v-if="item.category" class="text-[#7f8c8d] text-xs md:text-sm mb-1 italic">{{ item.category }}</p>
               <p class="text-[#7f8c8d] text-sm md:text-base font-medium">PKR {{ item.price.toFixed(2) }} × {{ item.quantity }}</p>
             </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="flex items-center gap-2 shrink-0">
               <button
                 @click="updateQuantity(index, item.quantity - 1)"
                 class="w-8 h-8 md:w-10 md:h-10 rounded-lg text-base md:text-lg font-bold bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0] transition-all flex items-center justify-center"
               >
                 -
               </button>
-              <span class="min-w-[32px] md:min-w-[40px] text-center font-bold text-base md:text-lg">{{ item.quantity }}</span>
+              <span class="min-w-8 md:min-w-10 text-center font-bold text-base md:text-lg">{{ item.quantity }}</span>
               <button
                 @click="updateQuantity(index, item.quantity + 1)"
                 class="w-8 h-8 md:w-10 md:h-10 rounded-lg text-base md:text-lg font-bold bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0] transition-all flex items-center justify-center"
