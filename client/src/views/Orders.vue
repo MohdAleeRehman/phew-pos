@@ -1,7 +1,7 @@
 <template>
-  <div class="p-8">
-    <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
-      <h1>Orders</h1>
+  <div class="p-4 md:p-8">
+    <div class="flex justify-between items-center mb-6 md:mb-8 flex-wrap gap-4">
+      <h1 class="text-2xl md:text-3xl font-bold text-[#2c3e50]">Orders</h1>
       <div class="flex gap-4 flex-wrap">
         <input
           v-model="filters.startDate"

@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import logo from '../assets/logo.jpeg'
@@ -76,6 +76,7 @@ export default {
   setup() {
     const router = useRouter()
     const authStore = useAuthStore()
+    const sidebarOpen = ref(false)
 
     const user = computed(() => authStore.user)
     const isAdmin = computed(() => authStore.isAdmin)
@@ -90,6 +91,7 @@ export default {
       isAdmin,
       handleLogout,
       logo,
+      sidebarOpen,
     }
   },
 }
