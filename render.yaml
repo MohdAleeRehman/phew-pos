@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: phew-pos-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 10000
+      - key: DEFAULT_ADMIN_USERNAME
+        value: admin
+      - key: DEFAULT_ADMIN_PASSWORD
+        value: PHEWcares12@
+      - key: TAX_ENABLED
+        value: "true"
+      - key: CASH_TAX_RATE
+        value: "0.18"
+      - key: CARD_TAX_RATE
+        value: "0.05"
+
