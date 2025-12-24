@@ -38,14 +38,14 @@ Set these in Render dashboard:
 6. Deploy
 
 ### Step 3: Get Backend URL
-After deployment, note your backend URL (e.g., `https://phew-pos-backend.onrender.com`)
+After deployment, note your backend URL (e.g., `https://phew-pos.onrender.com`)
 
 ## Frontend Deployment (Vercel)
 
 ### Step 1: Update API URL
 1. In Vercel dashboard, go to your project settings
 2. Add environment variable:
-   - `VITE_API_URL` = `https://your-backend-url.onrender.com/api`
+   - `VITE_API_URL` = `https://phew-pos.onrender.com/api`
 
 ### Step 2: Deploy to Vercel
 1. Go to Vercel dashboard
@@ -66,7 +66,7 @@ After getting your backend URL, update `vercel.json`:
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://your-backend.onrender.com/api/$1"
+      "destination": "https://phew-pos.onrender.com/api/$1"
     }
   ]
 }
@@ -102,7 +102,7 @@ Or use Render's shell to run the seed command.
 - `CARD_TAX_RATE` - 0.05
 
 ### Frontend (Vercel)
-- `VITE_API_URL` - Backend API URL (e.g., https://phew-pos-backend.onrender.com/api)
+- `VITE_API_URL` - Backend API URL (e.g., https://phew-pos.onrender.com/api)
 
 ## Troubleshooting
 

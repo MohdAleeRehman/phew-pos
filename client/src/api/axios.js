@@ -3,7 +3,16 @@ import axios from 'axios'
 // Use environment variable for API URL, fallback to /api for development/production
 const getApiUrl = () => {
   if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL
+    // Remove trailing slash if present and ensure it ends with /api
+    let url = import.meta.env.VITE_API_URL.trim()
+    if (url.endsWith('/')) {
+      url = url.slice(0, -1)
+    }
+    // If URL doesn't end with /api, add it
+    if (!url.endsWith('/api')) {
+      url = url.endsWith('/') ? url + 'api' : url + '/api'
+    }
+    return url
   }
   // In production without VITE_API_URL, use /api (will be proxied by Vercel if configured)
   // In development, use /api (proxied by Vite)

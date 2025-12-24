@@ -58,7 +58,7 @@
 5. **Deploy:**
    - Click "Create Web Service"
    - Wait for deployment to complete
-   - Note your backend URL (e.g., `https://phew-pos-backend.onrender.com`)
+   - Note your backend URL (e.g., `https://phew-pos.onrender.com`)
 
 ## 🌐 Deploy Frontend to Vercel
 
@@ -80,7 +80,7 @@
 
 4. **Set Environment Variable:**
    - **Key**: `VITE_API_URL`
-   - **Value**: `https://your-backend-url.onrender.com/api`
+   - **Value**: `https://phew-pos.onrender.com/api`
    - (Replace with your actual Render backend URL)
 
 5. **Deploy:**
@@ -131,9 +131,9 @@ npm run seed
 ## 🔗 Important URLs
 
 After deployment, update these in your documentation:
-- Backend URL: `https://your-backend.onrender.com`
-- Frontend URL: `https://your-app.vercel.app`
-- API Health Check: `https://your-backend.onrender.com/api/health`
+- Backend URL: `https://phew-pos.onrender.com`
+- Frontend URL: `https://your-app.vercel.app` (update after Vercel deployment)
+- API Health Check: `https://phew-pos.onrender.com/api/health`
 
 ## 🐛 Troubleshooting
 

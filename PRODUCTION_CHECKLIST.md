@@ -15,7 +15,7 @@
 - [ ] Set `CARD_TAX_RATE=0.05`
 
 ### Frontend (Vercel)
-- [ ] Set `VITE_API_URL` to your Render backend URL (e.g., `https://phew-pos-backend.onrender.com/api`)
+- [ ] Set `VITE_API_URL` to your Render backend URL: `https://phew-pos.onrender.com/api`
 - [ ] Update `vercel.json` with actual backend URL if using rewrites
 
 ## Post-Deployment
@@ -48,7 +48,7 @@
 ### API Connection Issues
 - Verify `VITE_API_URL` is set correctly in Vercel
 - Check backend is running and accessible
-- Verify health check endpoint works: `https://your-backend.onrender.com/api/health`
+- Verify health check endpoint works: `https://phew-pos.onrender.com/api/health`
 
 ### Order Creation Fails
 - Check MongoDB connection
