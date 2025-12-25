@@ -46,8 +46,9 @@
         </div>
       </div>
 
-      <div class="w-full lg:w-105 xl:w-120 bg-white rounded-xl p-4 md:p-6 flex flex-col shadow-md">
-        <div class="flex justify-between items-center mb-4 pb-4 border-b-2 border-[#e0e0e0]">
+      <div class="w-full lg:w-105 xl:w-120 bg-white rounded-xl p-4 md:p-6 flex flex-col shadow-md h-full max-h-full overflow-hidden">
+        <!-- Cart Header - Fixed -->
+        <div class="flex justify-between items-center mb-4 pb-4 border-b-2 border-[#e0e0e0] shrink-0">
           <h2 class="text-xl md:text-2xl font-bold text-[#2c3e50]">Cart</h2>
           <button 
             v-if="cart.length > 0" 
@@ -58,7 +59,8 @@
           </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto mb-4">
+        <!-- Cart Items - Scrollable -->
+        <div class="flex-1 overflow-y-auto mb-4 min-h-0 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded [&::-webkit-scrollbar-thumb]:bg-[#2d7a7a] [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb:hover]:bg-[#1a5a5a]">
           <div v-if="cart.length === 0" class="text-center py-8 text-[#7f8c8d] text-base md:text-lg">
             <p>Cart is empty</p>
           </div>
@@ -96,85 +98,88 @@
           </div>
         </div>
 
-        <div class="py-4 border-t-2 border-[#e0e0e0]">
-          <div class="flex justify-between py-2 text-base md:text-lg">
-            <span class="font-medium">Subtotal:</span>
-            <span class="font-semibold">PKR {{ cartTotal.toFixed(2) }}</span>
+        <!-- Summary Section - Fixed at bottom, scrollable if needed -->
+        <div class="shrink-0 flex flex-col overflow-y-auto min-h-0 max-h-[50vh]">
+          <div class="py-4 border-t-2 border-[#e0e0e0]">
+            <div class="flex justify-between py-2 text-base md:text-lg">
+              <span class="font-medium">Subtotal:</span>
+              <span class="font-semibold">PKR {{ cartTotal.toFixed(2) }}</span>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2 my-2">
+              <select v-model="discountType" class="flex-1 px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-sm md:text-base transition-colors focus:outline-none focus:border-[#2d7a7a]">
+                <option value="none">No Discount</option>
+                <option value="flat">Flat Discount</option>
+                <option value="percentage">Percentage Discount</option>
+              </select>
+              <input
+                v-if="discountType !== 'none'"
+                v-model.number="discountValue"
+                type="number"
+                class="flex-1 px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-sm md:text-base transition-colors focus:outline-none focus:border-[#2d7a7a]"
+                :placeholder="discountType === 'flat' ? 'Amount' : 'Percentage'"
+                min="0"
+              />
+            </div>
+            <div v-if="discountAmount > 0" class="flex justify-between py-2 text-base md:text-lg">
+              <span class="font-medium">Discount:</span>
+              <span class="font-semibold text-[#e74c3c]">-PKR {{ discountAmount.toFixed(2) }}</span>
+            </div>
+            <div v-if="taxConfig.isEnabled" class="flex justify-between py-2 text-base md:text-lg">
+              <span class="font-medium">GST ({{ (taxRate * 100).toFixed(0) }}%):</span>
+              <span class="font-semibold">PKR {{ taxAmount.toFixed(2) }}</span>
+            </div>
+            <div class="flex justify-between py-2 text-lg md:text-2xl font-bold text-[#2d7a7a] border-t-2 border-[#e0e0e0] mt-2 pt-2">
+              <span>Total:</span>
+              <span>PKR {{ grandTotal.toFixed(2) }}</span>
+            </div>
+            <div v-if="paymentMethod === 'cash' && cashReceived > 0 && change > 0" class="flex justify-between py-2 text-base md:text-xl font-bold text-[#27ae60] mt-2">
+              <span>Change:</span>
+              <span>PKR {{ change.toFixed(2) }}</span>
+            </div>
           </div>
-          <div class="flex flex-col sm:flex-row gap-2 my-2">
-            <select v-model="discountType" class="flex-1 px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-sm md:text-base transition-colors focus:outline-none focus:border-[#2d7a7a]">
-              <option value="none">No Discount</option>
-              <option value="flat">Flat Discount</option>
-              <option value="percentage">Percentage Discount</option>
-            </select>
-            <input
-              v-if="discountType !== 'none'"
-              v-model.number="discountValue"
-              type="number"
-              class="flex-1 px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-sm md:text-base transition-colors focus:outline-none focus:border-[#2d7a7a]"
-              :placeholder="discountType === 'flat' ? 'Amount' : 'Percentage'"
-              min="0"
-            />
-          </div>
-          <div v-if="discountAmount > 0" class="flex justify-between py-2 text-base md:text-lg">
-            <span class="font-medium">Discount:</span>
-            <span class="font-semibold text-[#e74c3c]">-PKR {{ discountAmount.toFixed(2) }}</span>
-          </div>
-          <div v-if="taxConfig.isEnabled" class="flex justify-between py-2 text-base md:text-lg">
-            <span class="font-medium">GST ({{ (taxRate * 100).toFixed(0) }}%):</span>
-            <span class="font-semibold">PKR {{ taxAmount.toFixed(2) }}</span>
-          </div>
-          <div class="flex justify-between py-2 text-lg md:text-2xl font-bold text-[#2d7a7a] border-t-2 border-[#e0e0e0] mt-2 pt-2">
-            <span>Total:</span>
-            <span>PKR {{ grandTotal.toFixed(2) }}</span>
-          </div>
-          <div v-if="paymentMethod === 'cash' && cashReceived > 0 && change > 0" class="flex justify-between py-2 text-base md:text-xl font-bold text-[#27ae60] mt-2">
-            <span>Change:</span>
-            <span>PKR {{ change.toFixed(2) }}</span>
-          </div>
-        </div>
 
-        <div class="mt-4 pt-4 border-t-2 border-[#e0e0e0]">
-          <h3 class="mb-4 text-lg md:text-xl font-bold text-[#2c3e50]">Payment Method</h3>
-          <div class="flex gap-2 mb-4">
+          <div class="mt-4 pt-4 border-t-2 border-[#e0e0e0]">
+            <h3 class="mb-4 text-lg md:text-xl font-bold text-[#2c3e50]">Payment Method</h3>
+            <div class="flex gap-2 mb-4">
+              <button
+                :class="['flex-1 px-4 md:px-6 py-3 rounded-lg text-sm md:text-base font-medium inline-flex items-center justify-center gap-2 transition-all', paymentMethod === 'cash' ? 'bg-[#2d7a7a] text-white hover:bg-[#1a5a5a]' : 'bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0]']"
+                @click="paymentMethod = 'cash'"
+              >
+                Cash
+              </button>
+              <button
+                :class="['flex-1 px-4 md:px-6 py-3 rounded-lg text-sm md:text-base font-medium inline-flex items-center justify-center gap-2 transition-all', paymentMethod === 'card' ? 'bg-[#2d7a7a] text-white hover:bg-[#1a5a5a]' : 'bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0]']"
+                @click="paymentMethod = 'card'"
+              >
+                Card
+              </button>
+            </div>
+            <div v-if="paymentMethod === 'cash'" class="mb-4">
+              <label class="block mb-2 font-medium text-sm md:text-base">Cash Received (PKR)</label>
+              <input
+                v-model.number="cashReceived"
+                type="number"
+                step="0.01"
+                min="0"
+                :placeholder="`Enter amount (Total: PKR ${grandTotal.toFixed(2)})`"
+                class="w-full px-4 py-3 border-2 border-[#e0e0e0] rounded-lg text-base md:text-lg transition-colors focus:outline-none focus:border-[#2d7a7a]"
+                @input="cashReceived = Math.max(0, cashReceived || 0)"
+              />
+              <div v-if="cashReceived > 0 && cashReceived < grandTotal" class="mt-2 text-sm md:text-base text-[#e74c3c] font-medium">
+                Insufficient amount. Need PKR {{ (grandTotal - cashReceived).toFixed(2) }} more.
+              </div>
+              <div v-if="cashReceived > 0 && change > 0" class="mt-2 text-base md:text-lg text-[#27ae60] font-bold">
+                Change: PKR {{ change.toFixed(2) }}
+              </div>
+            </div>
             <button
-              :class="['flex-1 px-4 md:px-6 py-3 rounded-lg text-sm md:text-base font-medium inline-flex items-center justify-center gap-2 transition-all', paymentMethod === 'cash' ? 'bg-[#2d7a7a] text-white hover:bg-[#1a5a5a]' : 'bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0]']"
-              @click="paymentMethod = 'cash'"
+              @click="processOrder"
+              :disabled="cart.length === 0 || processing || (paymentMethod === 'cash' && cashReceived < grandTotal)"
+              class="w-full px-4 py-4 bg-[#27ae60] text-white rounded-lg text-lg md:text-xl font-bold hover:bg-[#229954] transition-colors disabled:opacity-60 disabled:cursor-not-allowed sticky bottom-0"
             >
-              Cash
-            </button>
-            <button
-              :class="['flex-1 px-4 md:px-6 py-3 rounded-lg text-sm md:text-base font-medium inline-flex items-center justify-center gap-2 transition-all', paymentMethod === 'card' ? 'bg-[#2d7a7a] text-white hover:bg-[#1a5a5a]' : 'bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0]']"
-              @click="paymentMethod = 'card'"
-            >
-              Card
+              {{ processing ? 'Processing...' : 'Complete Order' }}
             </button>
           </div>
-          <div v-if="paymentMethod === 'cash'" class="mb-4">
-            <label class="block mb-2 font-medium text-sm md:text-base">Cash Received (PKR)</label>
-            <input
-              v-model.number="cashReceived"
-              type="number"
-              step="0.01"
-              min="0"
-              :placeholder="`Enter amount (Total: PKR ${grandTotal.toFixed(2)})`"
-              class="w-full px-4 py-3 border-2 border-[#e0e0e0] rounded-lg text-base md:text-lg transition-colors focus:outline-none focus:border-[#2d7a7a]"
-              @input="cashReceived = Math.max(0, cashReceived || 0)"
-            />
-            <div v-if="cashReceived > 0 && cashReceived < grandTotal" class="mt-2 text-sm md:text-base text-[#e74c3c] font-medium">
-              Insufficient amount. Need PKR {{ (grandTotal - cashReceived).toFixed(2) }} more.
-            </div>
-            <div v-if="cashReceived > 0 && change > 0" class="mt-2 text-base md:text-lg text-[#27ae60] font-bold">
-              Change: PKR {{ change.toFixed(2) }}
-            </div>
-          </div>
-          <button
-            @click="processOrder"
-            :disabled="cart.length === 0 || processing || (paymentMethod === 'cash' && cashReceived < grandTotal)"
-            class="w-full px-4 py-4 bg-[#27ae60] text-white rounded-lg text-lg md:text-xl font-bold hover:bg-[#229954] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {{ processing ? 'Processing...' : 'Complete Order' }}
-          </button>
         </div>
       </div>
     </div>

@@ -6,13 +6,13 @@
         <input
           v-model="filters.startDate"
           type="date"
-          class="w-auto min-w-[150px] px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-base transition-colors focus:outline-none focus:border-[#2d7a7a]"
+          class="w-auto min-w-37.5 px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-base transition-colors focus:outline-none focus:border-[#2d7a7a]"
           placeholder="Start Date"
         />
         <input
           v-model="filters.endDate"
           type="date"
-          class="w-auto min-w-[150px] px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-base transition-colors focus:outline-none focus:border-[#2d7a7a]"
+          class="w-auto min-w-37.5 px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-base transition-colors focus:outline-none focus:border-[#2d7a7a]"
           placeholder="End Date"
         />
         <button 
@@ -81,8 +81,8 @@
         <div class="flex flex-col gap-4">
           <div class="flex justify-between items-center p-4 bg-[#f5f5f5] rounded-lg">
             <div class="flex flex-col gap-1">
-              <span class="font-semibold text-[#2c3e50]">Cash (18% GST)</span>
-              <span class="text-sm text-[#7f8c8d]">Rate: 18%</span>
+              <span class="font-semibold text-[#2c3e50]">Cash (16% GST)</span>
+              <span class="text-sm text-[#7f8c8d]">Rate: 16%</span>
             </div>
             <div>
               <span class="text-xl font-bold text-[#2d7a7a]">PKR {{ taxBreakdown.cash?.taxCollected?.toFixed(2) || '0.00' }}</span>
