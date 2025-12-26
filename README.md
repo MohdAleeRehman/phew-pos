@@ -104,17 +104,19 @@ npm run dev-frontend
 
 ## Deployment
 
-### Backend (Render/Railway)
+### Backend (Railway/Render)
 - Root directory: `backend`
 - Build command: `npm install`
 - Start command: `npm start`
 - Environment variables: Set in deployment platform
+- Example Railway URL: `https://phew-pos-backend-production.up.railway.app`
 
 ### Frontend (Vercel)
-- Root directory: `client`
-- Build command: `npm run build`
-- Output directory: `dist`
-- Environment variables: `VITE_API_URL` pointing to backend URL
+- Root directory: `client` (auto-detected from vercel.json location)
+- Build command: `npm run build` (auto-detected from package.json)
+- Output directory: `dist` (auto-detected)
+- Environment variables: 
+  - `VITE_API_URL` = `https://phew-pos-backend-production.up.railway.app/api`
 
 ## License
 
