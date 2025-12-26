@@ -46,9 +46,10 @@ export const usePOSStore = defineStore('pos', {
 
     taxAmount: (state) => {
       if (!state.taxConfig.isEnabled) return 0
-      // Tax is calculated on BASE PRICE (before discount) based on payment method
+      // FBR compliant: GST is calculated on the amount AFTER discount
       const taxRate = state.taxConfig.rates[state.paymentMethod] || 0
-      return state.cartTotal * taxRate
+      const afterDiscount = state.cartTotal - state.discountAmount
+      return afterDiscount * taxRate
     },
 
     taxRate: (state) => {

@@ -130,6 +130,27 @@
           </div>
         </div>
       </div>
+
+      <!-- Category Sales Breakdown -->
+      <div class="bg-white rounded-xl p-8 shadow-md">
+        <h2 class="mb-6 text-[#2c3e50]">Category Sales Breakdown</h2>
+        <div class="flex flex-col gap-4">
+          <div
+            v-for="(category, index) in categorySales"
+            :key="category.category || index"
+            class="flex justify-between items-center p-4 bg-[#f5f5f5] rounded-lg"
+          >
+            <div class="flex flex-col gap-1">
+              <span class="font-semibold text-lg text-[#2c3e50]">{{ category.category }}</span>
+              <span class="text-sm text-[#7f8c8d]">{{ category.itemCount }} different items</span>
+            </div>
+            <div class="flex flex-col items-end gap-1">
+              <span class="text-xl font-bold text-[#2d7a7a]">{{ category.quantity }} items sold</span>
+              <span class="text-sm text-[#7f8c8d]">PKR {{ category.revenue.toFixed(2) }} revenue</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -151,6 +172,7 @@ export default {
     const paymentBreakdown = ref([])
     const taxBreakdown = ref(null)
     const topItems = ref([])
+    const categorySales = ref([])
 
     const fetchReports = async () => {
       loading.value = true
@@ -161,16 +183,18 @@ export default {
         if (filters.value.endDate) params.endDate = filters.value.endDate
 
         // Fetch all reports in parallel
-        const [salesRes, paymentRes, itemsRes] = await Promise.all([
+        const [salesRes, paymentRes, itemsRes, categoryRes] = await Promise.all([
           api.get('/reports/daily-sales', { params }),
           api.get('/reports/payment-breakdown', { params }),
           api.get('/reports/top-items', { params: { ...params, limit: 10 } }),
+          api.get('/reports/category-sales', { params }),
         ])
 
         salesSummary.value = salesRes.data.data.summary || {}
         paymentBreakdown.value = paymentRes.data.data.breakdown || []
         taxBreakdown.value = salesRes.data.data.taxBreakdown || paymentRes.data.data.taxBreakdown || null
         topItems.value = itemsRes.data.data || []
+        categorySales.value = categoryRes.data.data || []
       } catch (err) {
         error.value = err.response?.data?.message || 'Failed to fetch reports'
       } finally {
@@ -190,6 +214,7 @@ export default {
       paymentBreakdown,
       taxBreakdown,
       topItems,
+      categorySales,
       fetchReports,
     }
   },

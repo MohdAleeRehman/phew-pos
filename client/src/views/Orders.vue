@@ -36,22 +36,32 @@
       <div v-for="order in orders" :key="order._id" class="bg-white rounded-xl p-6 shadow-md">
         <div class="flex justify-between items-start mb-4 pb-4 border-b-2 border-[#e0e0e0]">
           <div>
-            <h3>{{ order.orderNumber }}</h3>
+            <h3 class="text-lg md:text-xl font-bold">{{ order.orderNumber }}</h3>
             <p class="text-[#7f8c8d] text-sm mt-2 capitalize">
               {{ new Date(order.createdAt).toLocaleString() }} • {{ order.orderType }} • {{ order.paymentMethod }}
             </p>
           </div>
           <div class="flex flex-col items-end gap-2">
-            <span 
-              :class="[
-                'px-3 py-1 rounded-full text-xs font-semibold capitalize',
-                order.status === 'pending' ? 'bg-[#f39c12] text-white' : '',
-                order.status === 'completed' ? 'bg-[#27ae60] text-white' : '',
-                order.status === 'cancelled' ? 'bg-[#e74c3c] text-white' : ''
-              ]"
-            >
-              {{ order.status }}
-            </span>
+            <div class="flex items-center gap-2">
+              <span 
+                :class="[
+                  'px-3 py-1 rounded-full text-xs font-semibold capitalize',
+                  order.status === 'pending' ? 'bg-[#f39c12] text-white' : '',
+                  order.status === 'completed' ? 'bg-[#27ae60] text-white' : '',
+                  order.status === 'cancelled' ? 'bg-[#e74c3c] text-white' : ''
+                ]"
+              >
+                {{ order.status }}
+              </span>
+              <button
+                v-if="isAdmin"
+                @click="deleteOrder(order._id)"
+                :disabled="deleting === order._id"
+                class="px-3 py-1 rounded-lg text-xs font-medium bg-[#e74c3c] text-white hover:bg-[#c0392b] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {{ deleting === order._id ? 'Deleting...' : 'Delete' }}
+              </button>
+            </div>
             <span class="text-xl font-bold text-[#2d7a7a]">PKR {{ order.total.toFixed(2) }}</span>
           </div>
         </div>
@@ -85,15 +95,19 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useAuthStore } from '../stores/auth'
 import api from '../api/axios'
 
 export default {
   name: 'Orders',
   setup() {
+    const authStore = useAuthStore()
+    const isAdmin = computed(() => authStore.isAdmin)
     const orders = ref([])
     const loading = ref(false)
     const error = ref('')
+    const deleting = ref(null)
     const filters = ref({
       startDate: '',
       endDate: '',
@@ -118,6 +132,22 @@ export default {
       }
     }
 
+    const deleteOrder = async (orderId) => {
+      if (!confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+        return
+      }
+
+      deleting.value = orderId
+      try {
+        await api.delete(`/orders/${orderId}`)
+        await fetchOrders()
+      } catch (err) {
+        alert(err.response?.data?.message || 'Failed to delete order')
+      } finally {
+        deleting.value = null
+      }
+    }
+
     onMounted(() => {
       fetchOrders()
     })
@@ -128,6 +158,9 @@ export default {
       error,
       filters,
       fetchOrders,
+      deleteOrder,
+      deleting,
+      isAdmin,
     }
   },
 }

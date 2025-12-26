@@ -132,7 +132,7 @@ exports.createOrder = async (req, res) => {
 
     const afterDiscount = subtotal - discountAmount;
 
-    // Get tax configuration - tax is calculated on BASE PRICE (before discounts)
+    // Get tax configuration - FBR compliant: GST is calculated AFTER discount is applied
     const taxConfig = await Tax.getTaxConfig();
     let taxAmount = 0;
     let taxRate = 0;
@@ -144,8 +144,8 @@ exports.createOrder = async (req, res) => {
         // Fallback to default rates if structure is different
         taxRate = paymentMethod === 'cash' ? 0.18 : 0.05;
       }
-      // Tax is calculated on original subtotal (before discount)
-      taxAmount = subtotal * taxRate;
+      // FBR compliant: Tax is calculated on the amount AFTER discount
+      taxAmount = afterDiscount * taxRate;
     }
 
     const total = afterDiscount + taxAmount;
@@ -227,6 +227,33 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(200).json({
       success: true,
       data: order,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Delete order
+// @route   DELETE /api/orders/:id
+// @access  Private/Admin
+exports.deleteOrder = async (req, res) => {
+  try {
+    const order = await Order.findByIdAndDelete(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Order deleted successfully',
     });
   } catch (error) {
     res.status(500).json({

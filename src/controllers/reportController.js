@@ -262,3 +262,62 @@ exports.getPaymentBreakdown = async (req, res) => {
   }
 };
 
+// @desc    Get category sales breakdown
+// @route   GET /api/reports/category-sales
+// @access  Private
+exports.getCategorySales = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    let query = { status: 'completed' };
+
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) {
+        query.createdAt.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        query.createdAt.$lte = end;
+      }
+    }
+
+    const orders = await Order.find(query);
+
+    // Aggregate category sales
+    const categorySales = {};
+
+    orders.forEach((order) => {
+      order.items.forEach((item) => {
+        const category = item.category || 'Uncategorized';
+        if (!categorySales[category]) {
+          categorySales[category] = {
+            category,
+            quantity: 0,
+            revenue: 0,
+            itemCount: 0,
+          };
+        }
+        categorySales[category].quantity += item.quantity;
+        categorySales[category].revenue += item.subtotal;
+        categorySales[category].itemCount += 1;
+      });
+    });
+
+    // Convert to array and sort by quantity
+    const categoryBreakdown = Object.values(categorySales)
+      .sort((a, b) => b.quantity - a.quantity);
+
+    res.status(200).json({
+      success: true,
+      count: categoryBreakdown.length,
+      data: categoryBreakdown,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
