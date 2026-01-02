@@ -1,16 +1,17 @@
 <template>
-  <div class="p-4 md:p-8 h-screen flex flex-col">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 md:mb-8">
-      <h1 class="text-2xl md:text-3xl text-[#2c3e50] font-bold">Point of Sale</h1>
-      <div class="flex gap-2 md:gap-4">
+  <div class="p-3 sm:p-4 lg:p-6 min-h-screen flex flex-col">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+      <h1 class="text-xl sm:text-2xl lg:text-3xl text-[#2c3e50] font-bold">Point of Sale</h1>
+      <div class="flex gap-2">
         <button
-          :class="['px-4 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium inline-flex items-center justify-center gap-2 transition-all', orderType === 'dine-in' ? 'bg-[#2d7a7a] text-white hover:bg-[#1a5a5a]' : 'bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0]']"
+          :class="['px-3 sm:px-4 lg:px-6 py-2 lg:py-3 rounded-lg text-xs sm:text-sm lg:text-base font-medium inline-flex items-center justify-center gap-1 sm:gap-2 transition-all', orderType === 'dine-in' ? 'bg-[#2d7a7a] text-white hover:bg-[#1a5a5a]' : 'bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0]']"
           @click="setOrderType('dine-in')"
         >
           Dine In
         </button>
         <button
-          :class="['px-4 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium inline-flex items-center justify-center gap-2 transition-all', orderType === 'takeaway' ? 'bg-[#2d7a7a] text-white hover:bg-[#1a5a5a]' : 'bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0]']"
+          :class="['px-3 sm:px-4 lg:px-6 py-2 lg:py-3 rounded-lg text-xs sm:text-sm lg:text-base font-medium inline-flex items-center justify-center gap-1 sm:gap-2 transition-all', orderType === 'takeaway' ? 'bg-[#2d7a7a] text-white hover:bg-[#1a5a5a]' : 'bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0]']"
           @click="setOrderType('takeaway')"
         >
           Takeaway
@@ -18,79 +19,109 @@
       </div>
     </div>
 
-    <div class="flex flex-col lg:flex-row gap-4 md:gap-8 flex-1 overflow-hidden">
-      <div class="flex-1 flex flex-col md:flex-row gap-4 overflow-hidden">
-        <div class="w-full md:w-48 lg:w-56 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto pb-2 md:pb-0">
+    <!-- Mobile Cart Toggle Button -->
+    <button 
+      @click="showMobileCart = !showMobileCart"
+      class="lg:hidden fixed bottom-4 right-4 z-30 w-14 h-14 bg-[#2d7a7a] text-white rounded-full shadow-lg flex items-center justify-center hover:bg-[#1a5a5a] transition-all"
+    >
+      <span class="text-xl">🛒</span>
+      <span v-if="cart.length > 0" class="absolute -top-1 -right-1 w-6 h-6 bg-[#ff6b35] rounded-full text-xs flex items-center justify-center font-bold">
+        {{ cart.reduce((sum, item) => sum + item.quantity, 0) }}
+      </span>
+    </button>
+
+    <!-- Main Content -->
+    <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 flex-1 overflow-hidden">
+      <!-- Menu Section -->
+      <div class="flex-1 flex flex-col lg:flex-row gap-3 overflow-hidden">
+        <!-- Categories - Horizontal scroll on mobile, Vertical sidebar on desktop -->
+        <div class="lg:hidden flex gap-2 overflow-x-auto pb-2 scrollbar-thin shrink-0">
           <button
             v-for="category in categories"
             :key="category._id"
-            :class="['px-4 py-3 border-2 rounded-lg cursor-pointer transition-all text-left font-medium whitespace-nowrap text-sm md:text-base', selectedCategory === category._id ? 'bg-[#2d7a7a] text-white border-[#2d7a7a]' : 'bg-white border-[#e0e0e0] hover:border-[#2d7a7a] hover:bg-[#f5f5f5]']"
+            :class="['px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg cursor-pointer transition-all font-medium whitespace-nowrap text-xs sm:text-sm shrink-0', selectedCategory === category._id ? 'bg-[#2d7a7a] text-white border-[#2d7a7a]' : 'bg-white border-[#e0e0e0] hover:border-[#2d7a7a] hover:bg-[#f5f5f5]']"
             @click="selectedCategory = category._id"
           >
             {{ category.name }}
           </button>
         </div>
 
-        <div class="flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-[repeat(auto-fit,minmax(180px,1fr))] auto-rows-max gap-3 md:gap-x-4 md:gap-y-4 overflow-y-auto p-2">
+        <!-- Categories Sidebar - Desktop Only -->
+        <div class="hidden lg:flex flex-col w-44 xl:w-52 shrink-0 bg-white rounded-xl shadow-sm overflow-hidden">
+          <div class="p-3 bg-[#2d7a7a] text-white font-semibold text-sm">Categories</div>
+          <div class="flex-1 overflow-y-auto">
+            <button
+              v-for="category in categories"
+              :key="category._id"
+              :class="['w-full px-4 py-3 text-left text-sm font-medium transition-all border-l-4', selectedCategory === category._id ? 'bg-[#f0f9f9] text-[#2d7a7a] border-[#2d7a7a]' : 'bg-white text-[#2c3e50] border-transparent hover:bg-[#f5f5f5] hover:border-[#e0e0e0]']"
+              @click="selectedCategory = category._id"
+            >
+              {{ category.name }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Menu Items Grid -->
+        <div class="flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 sm:gap-3 overflow-y-auto p-1 content-start auto-rows-max">
           <div
             v-for="item in filteredMenuItems"
             :key="item._id"
-            class="bg-white rounded-xl p-4 md:p-6 cursor-pointer transition-all shadow-md hover:-translate-y-0.5 hover:shadow-lg hover:border-2 hover:border-[#2d7a7a] h-35 md:h-40 flex flex-col justify-between"
+            class="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 cursor-pointer transition-all shadow-sm sm:shadow-md hover:-translate-y-0.5 hover:shadow-lg hover:border-2 hover:border-[#2d7a7a] h-24 sm:h-28 lg:h-32 flex flex-col justify-between"
             @click="addToCart(item)"
           >
             <div>
-              <h3 class="mb-2 text-[#2c3e50] font-medium line-clamp-2 text-sm md:text-base">{{ item.name }}</h3>
+              <h3 class="text-[#2c3e50] font-medium line-clamp-2 text-xs sm:text-sm lg:text-base leading-tight">{{ item.name }}</h3>
             </div>
-            <p class="text-[#2d7a7a] font-semibold text-base md:text-lg mt-auto">PKR {{ item.price.toFixed(2) }}</p>
+            <p class="text-[#2d7a7a] font-semibold text-sm sm:text-base lg:text-lg mt-auto">PKR {{ item.price.toFixed(0) }}</p>
           </div>
         </div>
       </div>
 
-      <div class="w-full lg:w-105 xl:w-120 bg-white rounded-xl p-4 md:p-6 flex flex-col shadow-md h-full max-h-full overflow-hidden">
-        <!-- Cart Header - Fixed -->
+      <!-- Cart Section - Desktop -->
+      <div class="hidden lg:flex w-80 xl:w-96 bg-white rounded-xl p-4 xl:p-6 flex-col shadow-md h-full max-h-full overflow-hidden">
+        <!-- Cart Header -->
         <div class="flex justify-between items-center mb-4 pb-4 border-b-2 border-[#e0e0e0] shrink-0">
-          <h2 class="text-xl md:text-2xl font-bold text-[#2c3e50]">Cart</h2>
+          <h2 class="text-xl xl:text-2xl font-bold text-[#2c3e50]">Cart</h2>
           <button 
             v-if="cart.length > 0" 
             @click="clearCart" 
-            class="px-4 py-2 rounded-lg text-sm md:text-base font-medium bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0] transition-all"
+            class="px-3 py-2 rounded-lg text-sm font-medium bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0] transition-all"
           >
             Clear
           </button>
         </div>
 
-        <!-- Cart Items - Scrollable -->
-        <div class="flex-1 overflow-y-auto mb-4 min-h-0 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded [&::-webkit-scrollbar-thumb]:bg-[#2d7a7a] [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb:hover]:bg-[#1a5a5a]">
-          <div v-if="cart.length === 0" class="text-center py-8 text-[#7f8c8d] text-base md:text-lg">
+        <!-- Cart Items -->
+        <div class="flex-1 overflow-y-auto mb-4 min-h-0 scrollbar-thin">
+          <div v-if="cart.length === 0" class="text-center py-8 text-[#7f8c8d] text-base">
             <p>Cart is empty</p>
           </div>
           <div
             v-for="(item, index) in cart"
             :key="index"
-            class="flex justify-between items-start gap-3 p-3 md:p-4 border-b border-[#e0e0e0]"
+            class="flex justify-between items-start gap-2 p-3 border-b border-[#e0e0e0]"
           >
             <div class="flex-1 min-w-0">
-              <h4 class="mb-1 text-base md:text-lg font-semibold text-[#2c3e50]">{{ item.name }}</h4>
-              <p v-if="item.category" class="text-[#7f8c8d] text-xs md:text-sm mb-1 italic">{{ item.category }}</p>
-              <p class="text-[#7f8c8d] text-sm md:text-base font-medium">PKR {{ item.price.toFixed(2) }} × {{ item.quantity }}</p>
+              <h4 class="mb-1 text-sm xl:text-base font-semibold text-[#2c3e50] truncate">{{ item.name }}</h4>
+              <p class="text-[#7f8c8d] text-xs xl:text-sm font-medium">PKR {{ item.price.toFixed(0) }} × {{ item.quantity }}</p>
             </div>
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex items-center gap-1 shrink-0">
               <button
                 @click="updateQuantity(index, item.quantity - 1)"
-                class="w-8 h-8 md:w-10 md:h-10 rounded-lg text-base md:text-lg font-bold bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0] transition-all flex items-center justify-center"
+                class="w-7 h-7 xl:w-8 xl:h-8 rounded-lg text-sm font-bold bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0] transition-all flex items-center justify-center"
               >
                 -
               </button>
-              <span class="min-w-8 md:min-w-10 text-center font-bold text-base md:text-lg">{{ item.quantity }}</span>
+              <span class="min-w-6 xl:min-w-8 text-center font-bold text-sm xl:text-base">{{ item.quantity }}</span>
               <button
                 @click="updateQuantity(index, item.quantity + 1)"
-                class="w-8 h-8 md:w-10 md:h-10 rounded-lg text-base md:text-lg font-bold bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0] transition-all flex items-center justify-center"
+                class="w-7 h-7 xl:w-8 xl:h-8 rounded-lg text-sm font-bold bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0] transition-all flex items-center justify-center"
               >
                 +
               </button>
               <button
                 @click="removeFromCart(index)"
-                class="w-8 h-8 md:w-10 md:h-10 rounded-lg text-lg md:text-xl font-bold bg-[#e74c3c] text-white hover:bg-[#c0392b] transition-all flex items-center justify-center"
+                class="w-7 h-7 xl:w-8 xl:h-8 rounded-lg text-base font-bold bg-[#e74c3c] text-white hover:bg-[#c0392b] transition-all flex items-center justify-center ml-1"
               >
                 ×
               </button>
@@ -98,15 +129,15 @@
           </div>
         </div>
 
-        <!-- Summary Section - Fixed at bottom, scrollable if needed -->
-        <div class="shrink-0 flex flex-col overflow-y-auto min-h-0 max-h-[50vh]">
-          <div class="py-4 border-t-2 border-[#e0e0e0]">
-            <div class="flex justify-between py-2 text-base md:text-lg">
+        <!-- Summary Section -->
+        <div class="shrink-0 flex flex-col overflow-y-auto min-h-0 max-h-[45vh]">
+          <div class="py-3 border-t-2 border-[#e0e0e0]">
+            <div class="flex justify-between py-1 text-sm xl:text-base">
               <span class="font-medium">Subtotal:</span>
-              <span class="font-semibold">PKR {{ cartTotal.toFixed(2) }}</span>
+              <span class="font-semibold">PKR {{ cartTotal.toFixed(0) }}</span>
             </div>
-            <div class="flex flex-col sm:flex-row gap-2 my-2">
-              <select v-model="discountType" class="flex-1 px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-sm md:text-base transition-colors focus:outline-none focus:border-[#2d7a7a]">
+            <div class="flex flex-col gap-2 my-2">
+              <select v-model="discountType" class="w-full px-2 py-2 border-2 border-[#e0e0e0] rounded-lg text-sm transition-colors focus:outline-none focus:border-[#2d7a7a]">
                 <option value="none">No Discount</option>
                 <option value="flat">Flat Discount</option>
                 <option value="percentage">Percentage Discount</option>
@@ -115,72 +146,211 @@
                 v-if="discountType !== 'none'"
                 v-model.number="discountValue"
                 type="number"
-                class="flex-1 px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-sm md:text-base transition-colors focus:outline-none focus:border-[#2d7a7a]"
+                class="w-full px-2 py-2 border-2 border-[#e0e0e0] rounded-lg text-sm transition-colors focus:outline-none focus:border-[#2d7a7a]"
                 :placeholder="discountType === 'flat' ? 'Amount' : 'Percentage'"
                 min="0"
               />
             </div>
-            <div v-if="discountAmount > 0" class="flex justify-between py-2 text-base md:text-lg">
+            <div v-if="discountAmount > 0" class="flex justify-between py-1 text-sm xl:text-base">
               <span class="font-medium">Discount:</span>
-              <span class="font-semibold text-[#e74c3c]">-PKR {{ discountAmount.toFixed(2) }}</span>
+              <span class="font-semibold text-[#e74c3c]">-PKR {{ discountAmount.toFixed(0) }}</span>
             </div>
-            <div v-if="taxConfig.isEnabled" class="flex justify-between py-2 text-base md:text-lg">
+            <div v-if="taxConfig.isEnabled" class="flex justify-between py-1 text-sm xl:text-base">
               <span class="font-medium">GST ({{ (taxRate * 100).toFixed(0) }}%):</span>
-              <span class="font-semibold">PKR {{ taxAmount.toFixed(2) }}</span>
+              <span class="font-semibold">PKR {{ taxAmount.toFixed(0) }}</span>
             </div>
-            <div class="flex justify-between py-2 text-lg md:text-2xl font-bold text-[#2d7a7a] border-t-2 border-[#e0e0e0] mt-2 pt-2">
+            <div class="flex justify-between py-2 text-lg xl:text-xl font-bold text-[#2d7a7a] border-t-2 border-[#e0e0e0] mt-2 pt-2">
               <span>Total:</span>
-              <span>PKR {{ grandTotal.toFixed(2) }}</span>
-            </div>
-            <div v-if="paymentMethod === 'cash' && cashReceived > 0 && change > 0" class="flex justify-between py-2 text-base md:text-xl font-bold text-[#27ae60] mt-2">
-              <span>Change:</span>
-              <span>PKR {{ change.toFixed(2) }}</span>
+              <span>PKR {{ grandTotal.toFixed(0) }}</span>
             </div>
           </div>
 
-          <div class="mt-4 pt-4 border-t-2 border-[#e0e0e0]">
-            <h3 class="mb-4 text-lg md:text-xl font-bold text-[#2c3e50]">Payment Method</h3>
-            <div class="flex gap-2 mb-4">
+          <div class="mt-3 pt-3 border-t-2 border-[#e0e0e0]">
+            <h3 class="mb-3 text-base xl:text-lg font-bold text-[#2c3e50]">Payment</h3>
+            <div class="flex gap-2 mb-3">
               <button
-                :class="['flex-1 px-4 md:px-6 py-3 rounded-lg text-sm md:text-base font-medium inline-flex items-center justify-center gap-2 transition-all', paymentMethod === 'cash' ? 'bg-[#2d7a7a] text-white hover:bg-[#1a5a5a]' : 'bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0]']"
+                :class="['flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all', paymentMethod === 'cash' ? 'bg-[#2d7a7a] text-white' : 'bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0]']"
                 @click="paymentMethod = 'cash'"
               >
                 Cash
               </button>
               <button
-                :class="['flex-1 px-4 md:px-6 py-3 rounded-lg text-sm md:text-base font-medium inline-flex items-center justify-center gap-2 transition-all', paymentMethod === 'card' ? 'bg-[#2d7a7a] text-white hover:bg-[#1a5a5a]' : 'bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0]']"
+                :class="['flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all', paymentMethod === 'card' ? 'bg-[#2d7a7a] text-white' : 'bg-[#e0e0e0] text-[#2c3e50] hover:bg-[#d0d0d0]']"
                 @click="paymentMethod = 'card'"
               >
                 Card
               </button>
             </div>
-            <div v-if="paymentMethod === 'cash'" class="mb-4">
-              <label class="block mb-2 font-medium text-sm md:text-base">Cash Received (PKR)</label>
+            <div v-if="paymentMethod === 'cash'" class="mb-3">
               <input
                 v-model.number="cashReceived"
                 type="number"
                 step="0.01"
                 min="0"
-                :placeholder="`Enter amount (Total: PKR ${grandTotal.toFixed(2)})`"
-                class="w-full px-4 py-3 border-2 border-[#e0e0e0] rounded-lg text-base md:text-lg transition-colors focus:outline-none focus:border-[#2d7a7a]"
-                @input="cashReceived = Math.max(0, cashReceived || 0)"
+                :placeholder="`Cash (Total: PKR ${grandTotal.toFixed(0)})`"
+                class="w-full px-3 py-2 border-2 border-[#e0e0e0] rounded-lg text-sm transition-colors focus:outline-none focus:border-[#2d7a7a]"
               />
-              <div v-if="cashReceived > 0 && cashReceived < grandTotal" class="mt-2 text-sm md:text-base text-[#e74c3c] font-medium">
-                Insufficient amount. Need PKR {{ (grandTotal - cashReceived).toFixed(2) }} more.
+              <div v-if="cashReceived > 0 && cashReceived < grandTotal" class="mt-1 text-xs text-[#e74c3c] font-medium">
+                Need PKR {{ (grandTotal - cashReceived).toFixed(0) }} more
               </div>
-              <div v-if="cashReceived > 0 && change > 0" class="mt-2 text-base md:text-lg text-[#27ae60] font-bold">
-                Change: PKR {{ change.toFixed(2) }}
+              <div v-if="cashReceived > 0 && change > 0" class="mt-1 text-sm text-[#27ae60] font-bold">
+                Change: PKR {{ change.toFixed(0) }}
               </div>
             </div>
             <button
               @click="processOrder"
               :disabled="cart.length === 0 || processing || (paymentMethod === 'cash' && cashReceived < grandTotal)"
-              class="w-full px-4 py-4 bg-[#27ae60] text-white rounded-lg text-lg md:text-xl font-bold hover:bg-[#229954] transition-colors disabled:opacity-60 disabled:cursor-not-allowed sticky bottom-0"
+              class="w-full px-4 py-3 bg-[#27ae60] text-white rounded-lg text-base font-bold hover:bg-[#229954] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {{ processing ? 'Processing...' : 'Complete Order' }}
             </button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Mobile Cart Modal -->
+    <div 
+      v-if="showMobileCart" 
+      class="lg:hidden fixed inset-0 bg-black/50 z-40"
+      @click="showMobileCart = false"
+    ></div>
+    <div 
+      :class="[
+        'lg:hidden fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-2xl transform transition-transform duration-300 max-h-[85vh] flex flex-col',
+        showMobileCart ? 'translate-y-0' : 'translate-y-full'
+      ]"
+    >
+      <!-- Mobile Cart Handle -->
+      <div class="flex justify-center py-2 border-b border-[#e0e0e0]">
+        <div class="w-12 h-1.5 bg-[#e0e0e0] rounded-full"></div>
+      </div>
+
+      <!-- Mobile Cart Header -->
+      <div class="flex justify-between items-center px-4 py-3 border-b border-[#e0e0e0]">
+        <h2 class="text-lg font-bold text-[#2c3e50]">Cart ({{ cart.reduce((sum, item) => sum + item.quantity, 0) }} items)</h2>
+        <div class="flex gap-2">
+          <button 
+            v-if="cart.length > 0" 
+            @click="clearCart" 
+            class="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#e0e0e0] text-[#2c3e50]"
+          >
+            Clear
+          </button>
+          <button 
+            @click="showMobileCart = false" 
+            class="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#e74c3c] text-white"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Cart Items -->
+      <div class="flex-1 overflow-y-auto px-4 py-2 min-h-0">
+        <div v-if="cart.length === 0" class="text-center py-8 text-[#7f8c8d]">
+          <p>Cart is empty</p>
+        </div>
+        <div
+          v-for="(item, index) in cart"
+          :key="index"
+          class="flex justify-between items-center gap-2 py-3 border-b border-[#e0e0e0]"
+        >
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-semibold text-[#2c3e50] truncate">{{ item.name }}</h4>
+            <p class="text-[#7f8c8d] text-xs">PKR {{ item.price.toFixed(0) }} × {{ item.quantity }}</p>
+          </div>
+          <div class="flex items-center gap-1">
+            <button
+              @click="updateQuantity(index, item.quantity - 1)"
+              class="w-7 h-7 rounded-lg text-sm font-bold bg-[#e0e0e0] text-[#2c3e50] flex items-center justify-center"
+            >
+              -
+            </button>
+            <span class="min-w-6 text-center font-bold text-sm">{{ item.quantity }}</span>
+            <button
+              @click="updateQuantity(index, item.quantity + 1)"
+              class="w-7 h-7 rounded-lg text-sm font-bold bg-[#e0e0e0] text-[#2c3e50] flex items-center justify-center"
+            >
+              +
+            </button>
+            <button
+              @click="removeFromCart(index)"
+              class="w-7 h-7 rounded-lg text-base font-bold bg-[#e74c3c] text-white flex items-center justify-center ml-1"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Cart Summary -->
+      <div class="px-4 py-3 border-t-2 border-[#e0e0e0] bg-white">
+        <div class="flex justify-between py-1 text-sm">
+          <span>Subtotal:</span>
+          <span class="font-semibold">PKR {{ cartTotal.toFixed(0) }}</span>
+        </div>
+        <div class="flex gap-2 my-2">
+          <select v-model="discountType" class="flex-1 px-2 py-2 border-2 border-[#e0e0e0] rounded-lg text-xs">
+            <option value="none">No Discount</option>
+            <option value="flat">Flat</option>
+            <option value="percentage">%</option>
+          </select>
+          <input
+            v-if="discountType !== 'none'"
+            v-model.number="discountValue"
+            type="number"
+            class="w-20 px-2 py-2 border-2 border-[#e0e0e0] rounded-lg text-xs"
+            :placeholder="discountType === 'flat' ? 'Amt' : '%'"
+            min="0"
+          />
+        </div>
+        <div v-if="discountAmount > 0" class="flex justify-between py-1 text-sm">
+          <span>Discount:</span>
+          <span class="text-[#e74c3c]">-PKR {{ discountAmount.toFixed(0) }}</span>
+        </div>
+        <div v-if="taxConfig.isEnabled" class="flex justify-between py-1 text-sm">
+          <span>GST ({{ (taxRate * 100).toFixed(0) }}%):</span>
+          <span>PKR {{ taxAmount.toFixed(0) }}</span>
+        </div>
+        <div class="flex justify-between py-2 text-lg font-bold text-[#2d7a7a] border-t border-[#e0e0e0] mt-1 pt-2">
+          <span>Total:</span>
+          <span>PKR {{ grandTotal.toFixed(0) }}</span>
+        </div>
+
+        <!-- Payment -->
+        <div class="flex gap-2 my-2">
+          <button
+            :class="['flex-1 px-3 py-2 rounded-lg text-xs font-medium', paymentMethod === 'cash' ? 'bg-[#2d7a7a] text-white' : 'bg-[#e0e0e0] text-[#2c3e50]']"
+            @click="paymentMethod = 'cash'"
+          >
+            Cash
+          </button>
+          <button
+            :class="['flex-1 px-3 py-2 rounded-lg text-xs font-medium', paymentMethod === 'card' ? 'bg-[#2d7a7a] text-white' : 'bg-[#e0e0e0] text-[#2c3e50]']"
+            @click="paymentMethod = 'card'"
+          >
+            Card
+          </button>
+        </div>
+        <div v-if="paymentMethod === 'cash'" class="mb-2">
+          <input
+            v-model.number="cashReceived"
+            type="number"
+            :placeholder="`Cash received (PKR ${grandTotal.toFixed(0)})`"
+            class="w-full px-3 py-2 border-2 border-[#e0e0e0] rounded-lg text-sm"
+          />
+          <div v-if="cashReceived > 0 && change > 0" class="mt-1 text-sm text-[#27ae60] font-bold">
+            Change: PKR {{ change.toFixed(0) }}
+          </div>
+        </div>
+        <button
+          @click="processOrder"
+          :disabled="cart.length === 0 || processing || (paymentMethod === 'cash' && cashReceived < grandTotal)"
+          class="w-full py-3 bg-[#27ae60] text-white rounded-lg text-base font-bold disabled:opacity-60"
+        >
+          {{ processing ? 'Processing...' : 'Complete Order' }}
+        </button>
       </div>
     </div>
 
@@ -220,6 +390,7 @@ export default {
   setup() {
     const posStore = usePOSStore()
     const processing = ref(false)
+    const showMobileCart = ref(false)
 
     const categories = computed(() => posStore.categories)
     const selectedCategory = computed({
@@ -334,6 +505,7 @@ export default {
       cashReceived,
       change,
       processing,
+      showMobileCart,
       addToCart,
       removeFromCart,
       updateQuantity,

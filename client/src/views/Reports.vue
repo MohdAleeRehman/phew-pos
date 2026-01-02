@@ -1,152 +1,146 @@
 <template>
-  <div class="p-4 md:p-8">
-    <div class="flex justify-between items-center mb-6 md:mb-8 flex-wrap gap-4">
-      <h1 class="text-2xl md:text-3xl font-bold text-[#2c3e50]">Reports & Analytics</h1>
-      <div class="flex gap-4 flex-wrap">
+  <div class="p-3 sm:p-4 lg:p-6">
+    <!-- Header -->
+    <div class="flex flex-col gap-4 mb-4 sm:mb-6">
+      <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-[#2c3e50]">Reports & Analytics</h1>
+      
+      <!-- Filters -->
+      <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:flex-wrap sm:items-center">
         <input
           v-model="filters.startDate"
           type="date"
-          class="w-auto min-w-37.5 px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-base transition-colors focus:outline-none focus:border-[#2d7a7a]"
+          class="w-full sm:w-auto px-3 py-2 border-2 border-[#e0e0e0] rounded-lg text-sm transition-colors focus:outline-none focus:border-[#2d7a7a]"
           placeholder="Start Date"
         />
         <input
           v-model="filters.endDate"
           type="date"
-          class="w-auto min-w-37.5 px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-base transition-colors focus:outline-none focus:border-[#2d7a7a]"
+          class="w-full sm:w-auto px-3 py-2 border-2 border-[#e0e0e0] rounded-lg text-sm transition-colors focus:outline-none focus:border-[#2d7a7a]"
           placeholder="End Date"
         />
         <button 
           @click="fetchReports" 
-          class="px-6 py-3 rounded-lg text-base font-medium inline-flex items-center justify-center gap-2 transition-all bg-[#2d7a7a] text-white hover:bg-[#1a5a5a]"
+          class="w-full sm:w-auto px-4 py-2 rounded-lg text-sm font-medium bg-[#2d7a7a] text-white hover:bg-[#1a5a5a] transition-all"
         >
           Apply Filters
         </button>
       </div>
     </div>
 
-    <div v-if="loading" class="flex justify-center items-center py-8">Loading reports...</div>
-    <div v-else-if="error" class="text-red-600 bg-red-50 p-4 rounded-lg">{{ error }}</div>
-    <div v-else class="flex flex-col gap-8">
-      <!-- Daily Sales Summary -->
-      <div class="bg-white rounded-xl p-8 shadow-md">
-        <h2 class="mb-6 text-[#2c3e50]">Sales Summary</h2>
-        <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6">
-          <div class="flex flex-col gap-2 p-4 bg-[#f5f5f5] rounded-lg">
-            <span class="text-[#7f8c8d] text-sm">Total Sales</span>
-            <span class="text-2xl font-bold text-[#2d7a7a]">PKR {{ salesSummary.totalSales?.toFixed(2) || '0.00' }}</span>
+    <div v-if="loading" class="flex justify-center items-center py-8 text-sm sm:text-base">Loading reports...</div>
+    <div v-else-if="error" class="text-red-600 bg-red-50 p-3 sm:p-4 rounded-lg text-sm sm:text-base">{{ error }}</div>
+    <div v-else class="flex flex-col gap-4 sm:gap-6">
+      <!-- Sales Summary -->
+      <div class="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-sm sm:shadow-md">
+        <h2 class="text-base sm:text-lg lg:text-xl font-bold text-[#2c3e50] mb-4">Sales Summary</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div class="flex flex-col gap-1 p-3 sm:p-4 bg-[#f5f5f5] rounded-lg">
+            <span class="text-[#7f8c8d] text-xs sm:text-sm">Total Sales</span>
+            <span class="text-lg sm:text-xl lg:text-2xl font-bold text-[#2d7a7a]">PKR {{ salesSummary.totalSales?.toFixed(0) || '0' }}</span>
           </div>
-          <div class="flex flex-col gap-2 p-4 bg-[#f5f5f5] rounded-lg">
-            <span class="text-[#7f8c8d] text-sm">Total Orders</span>
-            <span class="text-2xl font-bold text-[#2d7a7a]">{{ salesSummary.totalOrders || 0 }}</span>
+          <div class="flex flex-col gap-1 p-3 sm:p-4 bg-[#f5f5f5] rounded-lg">
+            <span class="text-[#7f8c8d] text-xs sm:text-sm">Total Orders</span>
+            <span class="text-lg sm:text-xl lg:text-2xl font-bold text-[#2d7a7a]">{{ salesSummary.totalOrders || 0 }}</span>
           </div>
-          <div class="flex flex-col gap-2 p-4 bg-[#f5f5f5] rounded-lg">
-            <span class="text-[#7f8c8d] text-sm">Average Order Value</span>
-            <span class="text-2xl font-bold text-[#2d7a7a]">PKR {{ salesSummary.averageOrderValue?.toFixed(2) || '0.00' }}</span>
+          <div class="flex flex-col gap-1 p-3 sm:p-4 bg-[#f5f5f5] rounded-lg">
+            <span class="text-[#7f8c8d] text-xs sm:text-sm">Avg Order</span>
+            <span class="text-lg sm:text-xl lg:text-2xl font-bold text-[#2d7a7a]">PKR {{ salesSummary.averageOrderValue?.toFixed(0) || '0' }}</span>
           </div>
-          <div class="flex flex-col gap-2 p-4 bg-[#f5f5f5] rounded-lg">
-            <span class="text-[#7f8c8d] text-sm">Total Tax</span>
-            <span class="text-2xl font-bold text-[#2d7a7a]">PKR {{ salesSummary.totalTax?.toFixed(2) || '0.00' }}</span>
+          <div class="flex flex-col gap-1 p-3 sm:p-4 bg-[#f5f5f5] rounded-lg">
+            <span class="text-[#7f8c8d] text-xs sm:text-sm">Total Tax</span>
+            <span class="text-lg sm:text-xl lg:text-2xl font-bold text-[#2d7a7a]">PKR {{ salesSummary.totalTax?.toFixed(0) || '0' }}</span>
           </div>
-          <div class="flex flex-col gap-2 p-4 bg-[#f5f5f5] rounded-lg">
-            <span class="text-[#7f8c8d] text-sm">Total Discount</span>
-            <span class="text-2xl font-bold text-[#2d7a7a]">PKR {{ salesSummary.totalDiscount?.toFixed(2) || '0.00' }}</span>
+          <div class="flex flex-col gap-1 p-3 sm:p-4 bg-[#f5f5f5] rounded-lg col-span-2 sm:col-span-1">
+            <span class="text-[#7f8c8d] text-xs sm:text-sm">Total Discount</span>
+            <span class="text-lg sm:text-xl lg:text-2xl font-bold text-[#2d7a7a]">PKR {{ salesSummary.totalDiscount?.toFixed(0) || '0' }}</span>
           </div>
         </div>
       </div>
 
       <!-- Payment Breakdown -->
-      <div class="bg-white rounded-xl p-8 shadow-md">
-        <h2 class="mb-6 text-[#2c3e50]">Payment Method Breakdown</h2>
-        <div class="flex flex-col gap-4">
+      <div class="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-sm sm:shadow-md">
+        <h2 class="text-base sm:text-lg lg:text-xl font-bold text-[#2c3e50] mb-4">Payment Breakdown</h2>
+        <div class="flex flex-col gap-3">
           <div
             v-for="method in paymentBreakdown"
             :key="method.method"
-            class="flex justify-between items-center p-4 bg-[#f5f5f5] rounded-lg"
+            class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 sm:p-4 bg-[#f5f5f5] rounded-lg"
           >
-            <div class="flex flex-col gap-1">
-              <span class="font-semibold text-[#2c3e50]">{{ method.method.replace('-', ' ').toUpperCase() }}</span>
-              <span class="text-sm text-[#7f8c8d]">{{ method.count }} orders</span>
+            <div class="flex flex-col gap-0.5">
+              <span class="font-semibold text-sm sm:text-base text-[#2c3e50]">{{ method.method.replace('-', ' ').toUpperCase() }}</span>
+              <span class="text-xs sm:text-sm text-[#7f8c8d]">{{ method.count }} orders</span>
             </div>
-            <div class="flex flex-col items-end gap-1">
-              <span class="text-xl font-bold text-[#2d7a7a]">PKR {{ method.total.toFixed(2) }}</span>
-              <span class="text-sm text-[#7f8c8d]">({{ method.percentage.toFixed(1) }}%)</span>
+            <div class="flex flex-col sm:items-end gap-0.5">
+              <span class="text-lg sm:text-xl font-bold text-[#2d7a7a]">PKR {{ method.total.toFixed(0) }}</span>
+              <span class="text-xs sm:text-sm text-[#7f8c8d]">({{ method.percentage.toFixed(1) }}%)</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Tax Breakdown (GST Summary) -->
-      <div v-if="taxBreakdown" class="bg-white rounded-xl p-8 shadow-md">
-        <h2 class="mb-6 text-[#2c3e50]">GST Tax Summary</h2>
-        <div class="flex flex-col gap-4">
-          <div class="flex justify-between items-center p-4 bg-[#f5f5f5] rounded-lg">
-            <div class="flex flex-col gap-1">
-              <span class="font-semibold text-[#2c3e50]">Cash (16% GST)</span>
-              <span class="text-sm text-[#7f8c8d]">Rate: 16%</span>
+      <!-- Tax Summary -->
+      <div v-if="taxBreakdown" class="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-sm sm:shadow-md">
+        <h2 class="text-base sm:text-lg lg:text-xl font-bold text-[#2c3e50] mb-4">GST Tax Summary</h2>
+        <div class="flex flex-col gap-3">
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 sm:p-4 bg-[#f5f5f5] rounded-lg">
+            <div class="flex flex-col gap-0.5">
+              <span class="font-semibold text-sm sm:text-base text-[#2c3e50]">Cash (16% GST)</span>
+              <span class="text-xs sm:text-sm text-[#7f8c8d]">Rate: 16%</span>
             </div>
-            <div>
-              <span class="text-xl font-bold text-[#2d7a7a]">PKR {{ taxBreakdown.cash?.taxCollected?.toFixed(2) || '0.00' }}</span>
-            </div>
+            <span class="text-lg sm:text-xl font-bold text-[#2d7a7a]">PKR {{ taxBreakdown.cash?.taxCollected?.toFixed(0) || '0' }}</span>
           </div>
-          <div class="flex justify-between items-center p-4 bg-[#f5f5f5] rounded-lg">
-            <div class="flex flex-col gap-1">
-              <span class="font-semibold text-[#2c3e50]">Card (5% GST)</span>
-              <span class="text-sm text-[#7f8c8d]">Rate: 5%</span>
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 sm:p-4 bg-[#f5f5f5] rounded-lg">
+            <div class="flex flex-col gap-0.5">
+              <span class="font-semibold text-sm sm:text-base text-[#2c3e50]">Card (5% GST)</span>
+              <span class="text-xs sm:text-sm text-[#7f8c8d]">Rate: 5%</span>
             </div>
-            <div>
-              <span class="text-xl font-bold text-[#2d7a7a]">PKR {{ taxBreakdown.card?.taxCollected?.toFixed(2) || '0.00' }}</span>
-            </div>
+            <span class="text-lg sm:text-xl font-bold text-[#2d7a7a]">PKR {{ taxBreakdown.card?.taxCollected?.toFixed(0) || '0' }}</span>
           </div>
-          <div class="flex justify-between items-center p-4 bg-[#2d7a7a] text-white rounded-lg font-bold">
-            <div>
-              <span>Total GST Collected</span>
-            </div>
-            <div>
-              <span class="text-xl">PKR {{ taxBreakdown.totalGST?.toFixed(2) || '0.00' }}</span>
-            </div>
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 sm:p-4 bg-[#2d7a7a] text-white rounded-lg font-bold">
+            <span class="text-sm sm:text-base">Total GST Collected</span>
+            <span class="text-lg sm:text-xl">PKR {{ taxBreakdown.totalGST?.toFixed(0) || '0' }}</span>
           </div>
         </div>
       </div>
 
       <!-- Top Selling Items -->
-      <div class="bg-white rounded-xl p-8 shadow-md">
-        <h2 class="mb-6 text-[#2c3e50]">Top Selling Items</h2>
-        <div class="flex flex-col gap-4">
+      <div class="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-sm sm:shadow-md">
+        <h2 class="text-base sm:text-lg lg:text-xl font-bold text-[#2c3e50] mb-4">Top Selling Items</h2>
+        <div class="flex flex-col gap-3">
           <div
             v-for="(item, index) in topItems"
             :key="item.menuItem?._id || index"
-            class="flex items-center gap-4 p-4 bg-[#f5f5f5] rounded-lg"
+            class="flex items-center gap-3 p-3 sm:p-4 bg-[#f5f5f5] rounded-lg"
           >
-            <div class="w-10 h-10 flex items-center justify-center bg-[#2d7a7a] text-white rounded-full font-bold">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-[#2d7a7a] text-white rounded-full font-bold text-xs sm:text-sm flex-shrink-0">
               #{{ index + 1 }}
             </div>
-            <div class="flex-1">
-              <h3 class="mb-1">{{ item.name }}</h3>
-              <p class="text-[#7f8c8d] text-xs italic mb-1">{{ item.category || 'Uncategorized' }}</p>
-              <p class="text-[#7f8c8d] text-sm">
-                {{ item.quantity }} sold • PKR {{ item.revenue.toFixed(2) }} revenue
+            <div class="flex-1 min-w-0">
+              <h3 class="font-medium text-sm sm:text-base truncate">{{ item.name }}</h3>
+              <p class="text-[#7f8c8d] text-xs sm:text-sm">
+                {{ item.quantity }} sold • PKR {{ item.revenue.toFixed(0) }}
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Category Sales Breakdown -->
-      <div class="bg-white rounded-xl p-8 shadow-md">
-        <h2 class="mb-6 text-[#2c3e50]">Category Sales Breakdown</h2>
-        <div class="flex flex-col gap-4">
+      <!-- Category Sales -->
+      <div class="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-sm sm:shadow-md">
+        <h2 class="text-base sm:text-lg lg:text-xl font-bold text-[#2c3e50] mb-4">Category Sales</h2>
+        <div class="flex flex-col gap-3">
           <div
             v-for="(category, index) in categorySales"
             :key="category.category || index"
-            class="flex justify-between items-center p-4 bg-[#f5f5f5] rounded-lg"
+            class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 sm:p-4 bg-[#f5f5f5] rounded-lg"
           >
-            <div class="flex flex-col gap-1">
-              <span class="font-semibold text-lg text-[#2c3e50]">{{ category.category }}</span>
-              <span class="text-sm text-[#7f8c8d]">{{ category.itemCount }} different items</span>
+            <div class="flex flex-col gap-0.5">
+              <span class="font-semibold text-sm sm:text-base lg:text-lg text-[#2c3e50]">{{ category.category }}</span>
+              <span class="text-xs sm:text-sm text-[#7f8c8d]">{{ category.itemCount }} different items</span>
             </div>
-            <div class="flex flex-col items-end gap-1">
-              <span class="text-xl font-bold text-[#2d7a7a]">{{ category.quantity }} items sold</span>
-              <span class="text-sm text-[#7f8c8d]">PKR {{ category.revenue.toFixed(2) }} revenue</span>
+            <div class="flex flex-col sm:items-end gap-0.5">
+              <span class="text-base sm:text-lg lg:text-xl font-bold text-[#2d7a7a]">{{ category.quantity }} sold</span>
+              <span class="text-xs sm:text-sm text-[#7f8c8d]">PKR {{ category.revenue.toFixed(0) }} revenue</span>
             </div>
           </div>
         </div>

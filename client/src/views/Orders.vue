@@ -1,21 +1,24 @@
 <template>
-  <div class="p-4 md:p-8">
-    <div class="flex justify-between items-center mb-6 md:mb-8 flex-wrap gap-4">
-      <h1 class="text-2xl md:text-3xl font-bold text-[#2c3e50]">Orders</h1>
-      <div class="flex gap-4 flex-wrap">
+  <div class="p-3 sm:p-4 lg:p-6">
+    <!-- Header -->
+    <div class="flex flex-col gap-4 mb-4 sm:mb-6">
+      <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-[#2c3e50]">Orders</h1>
+      
+      <!-- Filters -->
+      <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:flex-wrap sm:items-center">
         <input
           v-model="filters.startDate"
           type="date"
-          class="w-auto min-w-[150px] px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-base transition-colors focus:outline-none focus:border-[#2d7a7a]"
+          class="w-full sm:w-auto px-3 py-2 border-2 border-[#e0e0e0] rounded-lg text-sm transition-colors focus:outline-none focus:border-[#2d7a7a]"
           placeholder="Start Date"
         />
         <input
           v-model="filters.endDate"
           type="date"
-          class="w-auto min-w-[150px] px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-base transition-colors focus:outline-none focus:border-[#2d7a7a]"
+          class="w-full sm:w-auto px-3 py-2 border-2 border-[#e0e0e0] rounded-lg text-sm transition-colors focus:outline-none focus:border-[#2d7a7a]"
           placeholder="End Date"
         />
-        <select v-model="filters.status" class="w-auto min-w-[150px] px-3 py-3 border-2 border-[#e0e0e0] rounded-lg text-base transition-colors focus:outline-none focus:border-[#2d7a7a]">
+        <select v-model="filters.status" class="w-full sm:w-auto px-3 py-2 border-2 border-[#e0e0e0] rounded-lg text-sm transition-colors focus:outline-none focus:border-[#2d7a7a]">
           <option value="">All Status</option>
           <option value="pending">Pending</option>
           <option value="completed">Completed</option>
@@ -23,29 +26,33 @@
         </select>
         <button 
           @click="fetchOrders" 
-          class="px-6 py-3 rounded-lg text-base font-medium inline-flex items-center justify-center gap-2 transition-all bg-[#2d7a7a] text-white hover:bg-[#1a5a5a]"
+          class="w-full sm:w-auto px-4 py-2 rounded-lg text-sm font-medium bg-[#2d7a7a] text-white hover:bg-[#1a5a5a] transition-all"
         >
           Filter
         </button>
       </div>
     </div>
 
-    <div v-if="loading" class="flex justify-center items-center py-8">Loading orders...</div>
-    <div v-else-if="error" class="text-red-600 bg-red-50 p-4 rounded-lg">{{ error }}</div>
-    <div v-else class="flex flex-col gap-6">
-      <div v-for="order in orders" :key="order._id" class="bg-white rounded-xl p-6 shadow-md">
-        <div class="flex justify-between items-start mb-4 pb-4 border-b-2 border-[#e0e0e0]">
-          <div>
-            <h3 class="text-lg md:text-xl font-bold">{{ order.orderNumber }}</h3>
-            <p class="text-[#7f8c8d] text-sm mt-2 capitalize">
-              {{ new Date(order.createdAt).toLocaleString() }} • {{ order.orderType }} • {{ order.paymentMethod }}
+    <div v-if="loading" class="flex justify-center items-center py-8 text-sm sm:text-base">Loading orders...</div>
+    <div v-else-if="error" class="text-red-600 bg-red-50 p-3 sm:p-4 rounded-lg text-sm sm:text-base">{{ error }}</div>
+    <div v-else class="flex flex-col gap-3 sm:gap-4">
+      <div v-for="order in orders" :key="order._id" class="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 shadow-sm sm:shadow-md">
+        <!-- Order Header -->
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4 mb-3 pb-3 border-b-2 border-[#e0e0e0]">
+          <div class="flex-1">
+            <h3 class="text-base sm:text-lg lg:text-xl font-bold">{{ order.orderNumber }}</h3>
+            <p class="text-[#7f8c8d] text-xs sm:text-sm mt-1 capitalize">
+              {{ new Date(order.createdAt).toLocaleString() }}
+            </p>
+            <p class="text-[#7f8c8d] text-xs sm:text-sm capitalize">
+              {{ order.orderType }} • {{ order.paymentMethod }}
             </p>
           </div>
-          <div class="flex flex-col items-end gap-2">
+          <div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2">
             <div class="flex items-center gap-2">
               <span 
                 :class="[
-                  'px-3 py-1 rounded-full text-xs font-semibold capitalize',
+                  'px-2 sm:px-3 py-1 rounded-full text-xs font-semibold capitalize',
                   order.status === 'pending' ? 'bg-[#f39c12] text-white' : '',
                   order.status === 'completed' ? 'bg-[#27ae60] text-white' : '',
                   order.status === 'cancelled' ? 'bg-[#e74c3c] text-white' : ''
@@ -57,36 +64,40 @@
                 v-if="isAdmin"
                 @click="deleteOrder(order._id)"
                 :disabled="deleting === order._id"
-                class="px-3 py-1 rounded-lg text-xs font-medium bg-[#e74c3c] text-white hover:bg-[#c0392b] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-2 sm:px-3 py-1 rounded-lg text-xs font-medium bg-[#e74c3c] text-white hover:bg-[#c0392b] transition-all disabled:opacity-50"
               >
-                {{ deleting === order._id ? 'Deleting...' : 'Delete' }}
+                {{ deleting === order._id ? '...' : 'Delete' }}
               </button>
             </div>
-            <span class="text-xl font-bold text-[#2d7a7a]">PKR {{ order.total.toFixed(2) }}</span>
+            <span class="text-lg sm:text-xl font-bold text-[#2d7a7a]">PKR {{ order.total.toFixed(0) }}</span>
           </div>
         </div>
-        <div class="mb-4">
-          <div v-for="(item, index) in order.items" :key="index" class="flex justify-between py-2 border-b border-[#e0e0e0] last:border-b-0">
-            <span>{{ item.name }} × {{ item.quantity }}</span>
-            <span>PKR {{ item.subtotal.toFixed(2) }}</span>
+
+        <!-- Order Items -->
+        <div class="mb-3">
+          <div v-for="(item, index) in order.items" :key="index" class="flex justify-between py-1.5 sm:py-2 border-b border-[#e0e0e0] last:border-b-0 text-xs sm:text-sm">
+            <span class="flex-1">{{ item.name }} × {{ item.quantity }}</span>
+            <span class="font-medium">PKR {{ item.subtotal.toFixed(0) }}</span>
           </div>
         </div>
-        <div class="pt-4 border-t-2 border-[#e0e0e0]">
+
+        <!-- Order Summary -->
+        <div class="pt-3 border-t-2 border-[#e0e0e0] text-xs sm:text-sm">
           <div class="flex justify-between py-1">
             <span>Subtotal:</span>
-            <span>PKR {{ order.subtotal.toFixed(2) }}</span>
+            <span>PKR {{ order.subtotal.toFixed(0) }}</span>
           </div>
-          <div v-if="order.discountAmount > 0" class="flex justify-between py-1">
+          <div v-if="order.discountAmount > 0" class="flex justify-between py-1 text-[#e74c3c]">
             <span>Discount:</span>
-            <span>-PKR {{ order.discountAmount.toFixed(2) }}</span>
+            <span>-PKR {{ order.discountAmount.toFixed(0) }}</span>
           </div>
           <div v-if="order.taxAmount > 0" class="flex justify-between py-1">
             <span>GST ({{ (order.taxRate * 100).toFixed(0) }}%):</span>
-            <span>PKR {{ order.taxAmount.toFixed(2) }}</span>
+            <span>PKR {{ order.taxAmount.toFixed(0) }}</span>
           </div>
-          <div class="flex justify-between py-2 text-lg font-bold text-[#2d7a7a] mt-2 pt-2 border-t border-[#e0e0e0]">
+          <div class="flex justify-between py-2 text-base sm:text-lg font-bold text-[#2d7a7a] mt-1 pt-2 border-t border-[#e0e0e0]">
             <span>Total:</span>
-            <span>PKR {{ order.total.toFixed(2) }}</span>
+            <span>PKR {{ order.total.toFixed(0) }}</span>
           </div>
         </div>
       </div>
