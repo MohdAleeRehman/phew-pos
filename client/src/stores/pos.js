@@ -22,6 +22,7 @@ export const usePOSStore = defineStore('pos', {
       if (!state.selectedCategory) return state.menuItems
       return state.menuItems.filter(
         (item) =>
+          item.category &&
           item.category._id === state.selectedCategory &&
           item.isAvailable
       )
@@ -114,11 +115,6 @@ export const usePOSStore = defineStore('pos', {
       // Get category name - handle both populated and unpopulated category
       let categoryName = 'Uncategorized'
       
-      // Debug: log the item structure
-      console.log('Adding to cart - item:', item)
-      console.log('Item category:', item.category)
-      console.log('Categories available:', this.categories)
-      
       if (item.category) {
         // If category is populated object (from backend populate)
         if (item.category.name) {
@@ -142,8 +138,6 @@ export const usePOSStore = defineStore('pos', {
           categoryName = category?.name || 'Uncategorized'
         }
       }
-
-      console.log('Category name extracted:', categoryName)
 
       const cartItem = {
         menuItem: item._id,
