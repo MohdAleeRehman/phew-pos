@@ -223,7 +223,7 @@ export default {
     const categoryItems = computed(() => {
       if (!selectedCategory.value) return []
       return menuItems.value.filter(
-        (item) => item.category._id === selectedCategory.value._id
+        (item) => item.category && item.category._id === selectedCategory.value._id
       )
     })
 
